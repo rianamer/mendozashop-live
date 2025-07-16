@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Mendoza Shop</title>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/qDGrncf/logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script> if (localStorage.getItem('theme') === 'light') document.documentElement.classList.remove('dark'); else document.documentElement.classList.add('dark');</script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f3f4f6; }
+        .dark body { background-color: #0f172a; } .dark .bg-white { background-color: #1e293b; }
+        .dark h1, .dark h2, .dark label, .dark p { color: #e2e8f0; } .dark .text-gray-500 { color: #94a3b8; }
+        .dark .border { border-color: #475569; } .dark input, .dark textarea { background-color: #334155; border-color: #475569; color: #e2e8f0; padding: 0.5rem 0.75rem; }
+        .dark input:focus, .dark textarea:focus { border-color: #3b82f6; --tw-ring-color: #3b82f6; }
+        .dark .bg-gray-50 { background-color: #334155; }
+        .loader { width: 20px; height: 20px; border: 2px solid #FFF; border-bottom-color: transparent; border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
+        .folder { cursor: pointer; transition: transform 0.2s; } .folder:hover { transform: translateY(-4px); }
+        @keyframes rotation { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-slate-900 text-gray-800 dark:text-gray-200">
+
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 bg-gray-200 dark:bg-slate-900">
+        <div class="w-full max-w-md bg-white dark:bg-slate-800 shadow-xl rounded-2xl p-8">
+            <img src="https://i.postimg.cc/fyBrZht2/Gemini-Generated-Image-7nos987nos987nos-1.png" alt="Mendoza Shop Logo" class="h-12 mx-auto mb-4">
+            <h2 class="text-3xl font-bold text-center">Admin Login</h2>
+            <form id="login-form" class="mt-8 space-y-6">
+                <div><label for="username" class="block font-medium mb-2">Username</label><input type="text" id="username" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+                <div><label for="password" class="block font-medium mb-2">Password</label><input type="password" id="password" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">Masuk</button>
+                <p id="login-error" class="text-red-500 text-center mt-4 hidden">Username atau password salah.</p>
+            </form>
+        </div>
+    </div>
+
+    <div id="admin-content" class="container mx-auto p-6 md:p-12 hidden">
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center gap-x-4"><img src="https://i.postimg.cc/fyBrZht2/Gemini-Generated-Image-7nos987nos987nos-1.png" alt="Logo" class="h-14 w-auto"><div class="border-l-2 border-gray-300 dark:border-gray-600 h-10"></div><h1 class="text-3xl font-bold">Admin Panel</h1></div>
+            <button id="logout-button" class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600">Logout</button>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-3xl font-bold mb-2">Formulir Produk</h2>
+            <form id="product-form" class="space-y-6 mt-8"><input type="hidden" id="product-edit-id"><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label for="product-name" class="block text-sm font-medium">Nama Produk</label><input type="text" id="product-name" required class="mt-1 block w-full border rounded-md shadow-sm"></div><div><label for="product-price" class="block text-sm font-medium">Harga</label><input type="number" step="0.01" id="product-price" required class="mt-1 block w-full border rounded-md shadow-sm"></div><div><label for="product-category" class="block text-sm font-medium">Kategori</label><input type="text" id="product-category" required class="mt-1 block w-full border rounded-md shadow-sm"></div><div><label for="product-subcategory" class="block text-sm font-medium">Sub-Kategori</label><input type="text" id="product-subcategory" required class="mt-1 block w-full border rounded-md shadow-sm"></div></div><div><label for="product-images" class="block text-sm font-medium">URL Gambar (satu per baris)</label><textarea id="product-images" rows="4" class="mt-1 block w-full border rounded-md shadow-sm"></textarea></div><div><label for="product-description" class="block text-sm font-medium">Deskripsi</label><textarea id="product-description" rows="4" class="mt-1 block w-full border rounded-md shadow-sm"></textarea></div><div><button type="submit" id="product-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Tambah Produk</button><button type="button" data-action="cancel-edit" class="w-full mt-2 bg-gray-200 dark:bg-gray-600 font-bold py-3 px-4 rounded-lg hidden">Batal Edit</button></div></form>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8"><div class="flex items-center mb-6"><button data-action="go-back" class="bg-gray-200 dark:bg-gray-700 font-bold py-2 px-4 rounded-lg mr-4 hidden">← Kembali</button><h2 id="list-title" class="text-3xl font-bold">Memuat...</h2></div><div id="admin-view-container" class="min-h-[10rem]"><div id="category-view" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div><div id="subcategory-view" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 hidden"></div><div id="product-list-view" class="space-y-4 hidden"></div></div></div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8"><h2 class="text-3xl font-bold mb-2">Formulir Metode Pembayaran</h2><form id="payment-form" class="space-y-6 mt-8"><input type="hidden" id="payment-edit-id"><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label for="payment-name" class="block text-sm font-medium">Nama Metode</label><input type="text" id="payment-name" required class="mt-1 block w-full border rounded-md shadow-sm"></div><div><label for="payment-holder" class="block text-sm font-medium">Atas Nama</label><input type="text" id="payment-holder" class="mt-1 block w-full border rounded-md shadow-sm"></div></div><div><label for="payment-details" class="block text-sm font-medium">Nomor Rekening/HP</label><input type="text" id="payment-details" required class="mt-1 block w-full border rounded-md shadow-sm"></div><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label for="payment-logo" class="block text-sm font-medium">URL Logo</label><input type="url" id="payment-logo" class="mt-1 block w-full border rounded-md shadow-sm"></div><div><label for="payment-barcode" class="block text-sm font-medium">URL Barcode (Opsional)</label><input type="url" id="payment-barcode" class="mt-1 block w-full border rounded-md shadow-sm"></div></div><div><button type="submit" id="payment-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Tambah Metode</button></div></form></div>
+        <div class="bg-white rounded-xl shadow-lg p-8"><h2 class="text-3xl font-bold mb-2">Daftar Metode Pembayaran</h2><div id="payment-list" class="space-y-4 mt-6"></div></div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const getEl = id => document.getElementById(id);
+        const loginForm = getEl('login-form');
+        const loginScreen = getEl('login-screen');
+        const adminContent = getEl('admin-content');
+        const logoutButton = getEl('logout-button');
+        const CORRECT_USERNAME = 'admin';
+        const CORRECT_PASSWORD = 'admin123'; // Silakan ganti password ini
+
+        function showAdminPanel() {
+            loginScreen.classList.add('hidden');
+            adminContent.classList.remove('hidden');
+            initializeAdminApp();
+        }
+
+        if (sessionStorage.getItem('mendoza_admin_logged_in') === 'true') {
+            showAdminPanel();
+        }
+
+        loginForm.addEventListener('submit', e => {
+            e.preventDefault();
+            if (getEl('username').value === CORRECT_USERNAME && getEl('password').value === CORRECT_PASSWORD) {
+                sessionStorage.setItem('mendoza_admin_logged_in', 'true');
+                showAdminPanel();
+            } else {
+                getEl('login-error').classList.remove('hidden');
+            }
+        });
+        
+        logoutButton.addEventListener('click', () => {
+            sessionStorage.removeItem('mendoza_admin_logged_in');
+            window.location.reload();
+        });
+
+        function initializeAdminApp() {
+            const API_URL = 'https://script.google.com/macros/s/AKfycbye3g_cQaj8phduR2Xyh7s9XVed-nTqUgh4V5i6A7NthIx1B7PTsGYGw4iK_VNIvuah1Q/exec';
+            const state = { view: 'categories', products: [], paymentMethods: [], category: null, subcategory: null };
+            
+            const elements = { 
+                listTitle: getEl('list-title'), backBtn: getEl('admin-content').querySelector('[data-action="go-back"]'),
+                catView: getEl('category-view'), subcatView: getEl('subcategory-view'), prodView: getEl('product-list-view'), 
+                productForm: getEl('product-form'), formTitle: getEl('form-title-product'), 
+                submitBtn: getEl('product-submit-btn'), cancelBtn: getEl('product-form').querySelector('[data-action="cancel-edit"]'),
+                paymentList: getEl('payment-list'), paymentForm: getEl('payment-form') 
+            };
+            const pForm = { id: getEl('product-edit-id'), name: getEl('product-name'), price: getEl('product-price'), category: getEl('product-category'), subcategory: getEl('product-subcategory'), images: getEl('product-images'), description: getEl('product-description') };
+            const payForm = { name: getEl('payment-name'), holder: getEl('payment-holder'), details: getEl('payment-details'), logo: getEl('payment-logo'), barcode: getEl('payment-barcode') };
+
+            const render = {
+                folders: (items,type) => items.map(item => `<div class="folder border dark:border-gray-700 rounded-lg p-4 flex flex-col items-center text-center bg-gray-50 dark:bg-gray-800" data-action="navigate" data-type="${type}" data-value="${item}"><svg class="w-16 h-16 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg><p class="font-bold mt-2 w-full truncate">${item}</p></div>`).join(''),
+                products: items => items.map(p => `<div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border dark:border-gray-700"><div class="flex items-center min-w-0"><img src="${(p.image||'').split('|')[0]||'https://placehold.co/100x100'}" class="w-16 h-16 object-cover rounded-md mr-4 shrink-0"><div class="min-w-0"><p class="font-bold truncate">${p.name}</p><p class="text-sm text-gray-500 truncate">${p.category} / ${p.subcategory}</p></div></div><div class="shrink-0 ml-4"><button data-action="edit-product" data-id="${p.id}" class="bg-yellow-500 text-white py-2 px-4 rounded-lg mr-2">Edit</button><button data-action="delete-product" data-id="${p.id}" class="bg-red-500 text-white py-2 px-4 rounded-lg">Hapus</button></div></div>`).join(''),
+                payments: items => items.map(p => `<div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border dark:border-gray-700"><div class="flex items-center"><img src="${p.logo}" class="w-20 h-10 object-contain mr-4" onerror="this.style.display='none'"><p class="font-bold">${p.name}</p></div><button data-action="delete-payment" data-id="${p.id}" class="bg-red-500 text-white py-2 px-4 rounded-lg">Hapus</button></div>`).join(''),
+                page: () => {
+                    elements.backBtn.classList.toggle('hidden',state.view === 'categories');
+                    elements.catView.classList.toggle('hidden',state.view !== 'categories');
+                    elements.subcatView.classList.toggle('hidden',state.view !== 'subcategories');
+                    elements.prodView.classList.toggle('hidden',state.view !== 'products');
+                    if(state.view === 'categories') { elements.listTitle.textContent = 'Daftar Kategori'; elements.catView.innerHTML = render.folders([...new Set(state.products.map(p=>p.category))], 'category');}
+                    else if(state.view === 'subcategories') { elements.listTitle.textContent=`Kategori: ${state.category}`; const subcats=[...new Set(state.products.filter(p=>p.category===state.category).map(p=>p.subcategory))]; elements.subcatView.innerHTML=render.folders(subcats,'subcategory');}
+                    else if(state.view === 'products') { elements.listTitle.textContent=`Sub-Kategori: ${state.subcategory}`; elements.prodView.innerHTML = render.products(state.products.filter(p=>p.category===state.category && p.subcategory===state.subcategory));}
+                    elements.paymentList.innerHTML = render.payments(state.paymentMethods);
+                }
+            };
+            const actions = {
+                navigate(target) { if(target.dataset.type === 'category'){state.view='subcategories'; state.category=target.dataset.value;}else{state.view='products';state.subcategory=target.dataset.value;} render.page(); },
+                'go-back'() { state.view = state.view === 'products' ? 'subcategories' : 'categories'; render.page(); },
+                'edit-product'(target) { const p = state.products.find(prod => prod.id == target.dataset.id); if(!p)return; Object.keys(pForm).forEach(key => pForm[key].value = key === 'images' ? (p[key]||'').split('|').join('\n') : p[key]||''); elements.formTitle.textContent = 'Edit Produk'; elements.submitBtn.textContent = 'Update Produk'; elements.cancelBtn.classList.remove('hidden'); elements.productForm.scrollIntoView({behavior:'smooth'}); },
+                'cancel-edit'() { elements.productForm.reset(); pForm.id.value = ''; elements.formTitle.textContent='Formulir Produk'; elements.submitBtn.textContent='Tambah Produk'; elements.cancelBtn.classList.add('hidden'); },
+                async post(action, data) {
+                    const btn = action.includes('Product') ? elements.submitBtn : elements.paymentForm.querySelector('button[type="submit"]');
+                    btn.disabled = true; btn.innerHTML = `<span class="loader"></span>`;
+                    await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action, data})});
+                    btn.disabled = false;
+                    if(action.includes('Product')) actions['cancel-edit'](); else elements.paymentForm.reset();
+                    setTimeout(init, 2000);
+                },
+                async 'delete-product'(target) { if(confirm('Yakin hapus?')) { elements.listTitle.textContent='Menghapus...'; actions.post('deleteProduct',{id:target.dataset.id}); } },
+                async 'delete-payment'(target) { if(confirm('Yakin hapus?')) { elements.listTitle.textContent='Menghapus...'; actions.post('deletePayment',{id:target.dataset.id}); } }
+            };
+            
+            elements.productForm.addEventListener('submit', e => { e.preventDefault(); const id=pForm.id.value, data={id:id?parseInt(id):Date.now(),name:pForm.name.value,price:parseFloat(pForm.price.value),category:pForm.category.value.trim(),subcategory:pForm.subcategory.value.trim(),image:pForm.images.value.split('\n').filter(Boolean).join('|'),description:pForm.description.value}; actions.post(id?'updateProduct':'addProduct',data); });
+            elements.paymentForm.addEventListener('submit', e => { e.preventDefault(); const data = {id:Date.now(),name:payForm.name.value,details:`${payForm.details.value}<br>a/n: ${payForm.holder.value}`,logo:payForm.logo.value,barcode:payForm.barcode.value}; actions.post('addPayment',data); });
+            adminContent.addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target && actions[target.dataset.action]) actions[target.dataset.action](target); });
+            
+            async function init() {
+                elements.listTitle.textContent = 'Memuat data...';
+                try {
+                    const res = await fetch(API_URL); if (!res.ok) throw new Error('Network error'); const data = await res.json();
+                    state.products = data.products || []; state.paymentMethods = data.paymentMethods || []; render.page();
+                } catch(err) { console.error(err); elements.listTitle.textContent = 'Gagal memuat data.'; }
+            }
+            init();
+        }
+    });
+</script>
+</body>
+</html>
