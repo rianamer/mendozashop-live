@@ -147,5 +147,24 @@
         }
     });
 </script>
-</body>
+</body><!-- Letakkan ini SEBELUM tag penutup </body> -->
+<script src="data.js"></script>
+<script>
+  // KODE JAVASCRIPT BARU UNTUK INDEX.HTML
+  document.addEventListener('DOMContentLoaded', () => {
+    // Ambil data dari file data.js, bukan lagi dari API
+    const state = {
+      products: mendozaData.products || [],
+      paymentMethods: mendozaData.paymentMethods || [],
+      cart: JSON.parse(localStorage.getItem('mendozaCart') || '[]'),
+      activeCategory: null,
+      activeSubcategory: null,
+    };
+    // ... (seluruh logika frontend lainnya akan bekerja dengan data ini) ...
+    // Logika lengkap akan saya berikan di pesan berikutnya jika ini berhasil
+    console.log("Data berhasil dimuat dari data.js:", state.products.length, "produk ditemukan.");
+    document.getElementById('loading-state').remove();
+    // Fungsi untuk render halaman akan dipanggil di sini...
+  });
+</script>
 </html>
